@@ -18,18 +18,27 @@ export class Movie {
   @Column({ type: 'int' })
   releaseYear: number;
 
+  @Column({ type: 'int', nullable: true })
+  duration: number; // in minutes
+
   @Column({ nullable: true })
   posterPath: string;
 
   @Column({ nullable: true })
-  videoPath: string;
+  videoPath: string; // Full movie path
 
-  @ManyToOne(() => User, (user) => user.movies)
-  @JoinColumn({ name: 'userId' })
-  user: User;
+  @Column({ nullable: true })
+  trailerPath: string; // Trailer path for free users
 
-  @Column()
-  userId: string;
+  @ManyToOne(() => User, (user) => user.movies, { eager: true })
+  @JoinColumn({ name: 'uploadedBy' })
+  uploadedBy: User;
+
+  @Column({ nullable: true })
+  uploadedById: string;
+
+  @Column({ default: true })
+  isPublished: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
