@@ -20,6 +20,6 @@ describe('AppController (e2e)', () => {
     return request.default(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('Welcome to Movie API! Visit /health to check API status');
   });
 });
