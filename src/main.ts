@@ -1,18 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
-  
-  // Swagger Configuration
+
   const config = new DocumentBuilder()
     .setTitle('Movie Streaming API')
-    .setDescription('REST API for movie streaming platform with role-based access control')
+    .setDescription(
+      'REST API for movie streaming platform with role-based access control',
+    )
     .setVersion('1.0')
     .addTag('Authentication', 'User registration and login endpoints')
     .addTag('Movies', 'Movie management and streaming endpoints')
@@ -27,7 +28,7 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth', // This name here is important for reference
+      'JWT-auth',
     )
     .build();
 
@@ -49,5 +50,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Swagger documentation: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+
+void bootstrap();

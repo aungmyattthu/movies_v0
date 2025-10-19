@@ -13,11 +13,11 @@ import {
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
   ApiConsumes,
   ApiBody,
   ApiParam,
@@ -30,6 +30,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../roles/entities/role.entity';
 import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { User } from '../users/entities/user.entity';
+
+interface RequestWithUser extends Request {
+  user: User;
+}
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -40,9 +45,10 @@ export class MoviesController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Upload a new movie (Admin only)',
-    description: 'Uploads a movie with poster, full video, and trailer. Only accessible by admin users.',
+    description:
+      'Uploads a movie with poster, full video, and trailer. Only accessible by admin users.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -81,7 +87,8 @@ export class MoviesController {
             cb(null, uploadPath);
           },
           filename: (req, file, cb) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
             cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
           },
         }),
@@ -93,68 +100,61 @@ export class MoviesController {
   )
   async create(
     @Body(ValidationPipe) createMovieDto: CreateMovieDto,
-    @UploadedFiles() files: { 
-      poster?: Express.Multer.File[]; 
+    @UploadedFiles()
+    files: {
+      poster?: Express.Multer.File[];
       video?: Express.Multer.File[];
       trailer?: Express.Multer.File[];
     },
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
     const posterPath = files.poster?.[0]?.path;
     const videoPath = files.video?.[0]?.path;
     const trailerPath = files.trailer?.[0]?.path;
 
     return this.moviesService.create(
-      createMovieDto, 
-      req.user.id, 
-      posterPath, 
+      createMovieDto,
+      req.user.id,
+      posterPath,
       videoPath,
       trailerPath,
     );
   }
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all movies',
-    description: 'Returns list of all movies with metadata only (no video paths)',
+    description:
+      'Returns list of all movies with metadata only (no video paths)',
   })
-  @ApiResponse({ status: 200, description: 'List of movies retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of movies retrieved successfully',
+  })
   async findAll() {
     return this.moviesService.findAll();
   }
-
   @Get(':id/watch')
   @UseGuards(AuthGuard('jwt'), SubscriptionGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Watch full movie (Premium/Admin only)',
-    description: 'Access full movie video. Requires active premium subscription or admin role.',
+    description:
+      'Access full movie video. Requires active premium subscription or admin role.',
   })
   @ApiParam({ name: 'id', description: 'Movie ID' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Movie access granted',
-    schema: {
-      example: {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        title: 'Inception',
-        videoPath: 'uploads/videos/123456-movie.mp4',
-        message: 'Access granted to full movie',
-        streamUrl: 'http://localhost:3000/uploads/videos/123456-movie.mp4',
-      },
-    },
-  })
+  @ApiResponse({ status: 200, description: 'Movie access granted' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Subscription required or expired' })
   @ApiResponse({ status: 404, description: 'Movie not found' })
-  async watchMovie(@Param('id') id: string, @Request() req) {
-    return this.moviesService.getFullMovie(id, req.user.id);
+  async watchMovie(@Param('id') id: string) {
+    return this.moviesService.getFullMovie(id);
   }
 
   @Get(':id/trailer')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Watch movie trailer',
     description: 'Access movie trailer. Available to all authenticated users.',
   })
@@ -170,18 +170,18 @@ export class MoviesController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get my uploaded movies (Admin only)',
     description: 'Returns list of movies uploaded by the authenticated admin.',
   })
   @ApiResponse({ status: 200, description: 'List of uploaded movies' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  async findMyMovies(@Request() req) {
+  async findMyMovies(@Request() req: RequestWithUser) {
     return this.moviesService.findByUser(req.user.id);
   }
 
   @Get(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get movie details',
     description: 'Returns movie details without video paths',
   })
@@ -196,15 +196,18 @@ export class MoviesController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Delete movie (Admin only)',
     description: 'Deletes a movie. Admin can only delete their own uploads.',
   })
   @ApiParam({ name: 'id', description: 'Movie ID' })
   @ApiResponse({ status: 200, description: 'Movie deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Can only delete own movies' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Can only delete own movies',
+  })
   @ApiResponse({ status: 404, description: 'Movie not found' })
-  async delete(@Param('id') id: string, @Request() req) {
+  async delete(@Param('id') id: string, @Request() req: RequestWithUser) {
     await this.moviesService.delete(id, req.user.id);
     return { message: 'Movie deleted successfully' };
   }

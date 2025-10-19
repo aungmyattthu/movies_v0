@@ -14,8 +14,15 @@ export class UsersService {
     private rolesService: RolesService,
   ) {}
 
-  async create(email: string, username: string, password: string, roleName: UserRole = UserRole.FREE): Promise<User> {
-    const existingUser = await this.usersRepository.findOne({ where: { email } });
+  async create(
+    email: string,
+    username: string,
+    password: string,
+    roleName: UserRole = UserRole.FREE,
+  ): Promise<User> {
+    const existingUser = await this.usersRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
@@ -37,14 +44,14 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ 
+    return this.usersRepository.findOne({
       where: { email },
       relations: ['role', 'subscription'],
     });
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.usersRepository.findOne({ 
+    return this.usersRepository.findOne({
       where: { id },
       relations: ['role', 'subscription'],
     });

@@ -1,4 +1,10 @@
-import { IsEnum, IsUUID, IsDateString, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsEnum,
+  IsUUID,
+  IsDateString,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PlanType } from '../entities/subscription.entity';
 

@@ -1,4 +1,11 @@
-import { IsString, IsInt, Min, Max, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  Min,
+  Max,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -33,7 +40,7 @@ export class CreateMovieDto {
     minimum: 1888,
     maximum: 2030,
   })
-  @Transform(({ value }) => parseInt(value, 10))
+  @Transform(({ value }: { value: string }) => parseInt(value, 10))
   @IsInt()
   @Min(1888)
   @Max(2030)
@@ -43,7 +50,7 @@ export class CreateMovieDto {
     description: 'Movie duration in minutes',
     example: 148,
   })
-  @Transform(({ value }) => parseInt(value, 10))
+  @Transform(({ value }: { value: string }) => parseInt(value, 10))
   @IsInt()
   @IsOptional()
   duration?: number;

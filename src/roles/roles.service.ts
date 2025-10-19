@@ -17,12 +17,20 @@ export class RolesService implements OnModuleInit {
   private async seedRoles() {
     const roles = [
       { name: UserRole.ADMIN, description: 'Administrator with full access' },
-      { name: UserRole.PREMIUM, description: 'Premium user with full movie access' },
-      { name: UserRole.FREE, description: 'Free user with trailer access only' },
+      {
+        name: UserRole.PREMIUM,
+        description: 'Premium user with full movie access',
+      },
+      {
+        name: UserRole.FREE,
+        description: 'Free user with trailer access only',
+      },
     ];
 
     for (const roleData of roles) {
-      const exists = await this.rolesRepository.findOne({ where: { name: roleData.name } });
+      const exists = await this.rolesRepository.findOne({
+        where: { name: roleData.name },
+      });
       if (!exists) {
         const role = this.rolesRepository.create(roleData);
         await this.rolesRepository.save(role);

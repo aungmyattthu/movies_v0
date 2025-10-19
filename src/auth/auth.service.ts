@@ -11,14 +11,24 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(email: string, username: string, password: string, role: UserRole = UserRole.FREE) {
-    const user = await this.usersService.create(email, username, password, role);
-    const payload = { 
-      sub: user.id, 
+  async register(
+    email: string,
+    username: string,
+    password: string,
+    role: UserRole = UserRole.FREE,
+  ) {
+    const user = await this.usersService.create(
+      email,
+      username,
+      password,
+      role,
+    );
+    const payload = {
+      sub: user.id,
       email: user.email,
       role: user.role.name,
     };
-    
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -32,7 +42,7 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
-    
+
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -41,12 +51,12 @@ export class AuthService {
       throw new UnauthorizedException('Account is deactivated');
     }
 
-    const payload = { 
-      sub: user.id, 
+    const payload = {
+      sub: user.id,
       email: user.email,
       role: user.role.name,
     };
-    
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
