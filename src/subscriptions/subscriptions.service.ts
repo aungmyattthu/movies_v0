@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -11,13 +15,17 @@ export class SubscriptionsService {
     private subscriptionsRepository: Repository<Subscription>,
   ) {}
 
-  async create(createSubscriptionDto: CreateSubscriptionDto): Promise<Subscription> {
+  async create(
+    createSubscriptionDto: CreateSubscriptionDto,
+  ): Promise<Subscription> {
     const existing = await this.findByUserId(createSubscriptionDto.userId);
     if (existing) {
       throw new BadRequestException('User already has a subscription');
     }
 
-    const subscription = this.subscriptionsRepository.create(createSubscriptionDto);
+    const subscription = this.subscriptionsRepository.create(
+      createSubscriptionDto,
+    );
     return this.subscriptionsRepository.save(subscription);
   }
 
@@ -38,10 +46,12 @@ export class SubscriptionsService {
 
     const now = new Date();
     const duration = planType === PlanType.MONTHLY ? 30 : 365;
-    
+
     subscription.planType = planType;
     subscription.startDate = now;
-    subscription.expiryDate = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
+    subscription.expiryDate = new Date(
+      now.getTime() + duration * 24 * 60 * 60 * 1000,
+    );
     subscription.isActive = true;
 
     return this.subscriptionsRepository.save(subscription);

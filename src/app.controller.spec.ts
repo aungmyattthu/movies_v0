@@ -16,8 +16,9 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Welcome to Movie API! Visit /health to check API status');
-
+      expect(appController.getHello()).toBe(
+        'Welcome to Movie API! Visit /health to check API status',
+      );
     });
   });
 });

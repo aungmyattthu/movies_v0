@@ -1,8 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm";
-import { Exclude } from "class-transformer";
-import {Movie} from "../../movies/entities/movie.entity";
-import { Role } from "src/roles/entities/role.entity";
-import { Subscription } from "src/subscriptions/entities/subscription.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Movie } from '../../movies/entities/movie.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 
 @Entity('users')
 export class User {

@@ -15,12 +15,12 @@ export class AppController {
   }
 
   @Get('health')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Health check',
     description: 'Check if API is running and responsive',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'API is healthy',
     schema: {
       example: {

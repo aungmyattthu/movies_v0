@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Movie } from './entities/movie.entity';
@@ -17,7 +21,7 @@ export class MoviesService {
     posterPath?: string,
     videoPath?: string,
     trailerPath?: string,
-  ): Promise<any> {
+  ): Promise<Movie> {
     const movie = this.moviesRepository.create({
       ...createMovieDto,
       uploadedById: userId,
@@ -30,15 +34,23 @@ export class MoviesService {
   }
 
   async findAll(): Promise<Movie[]> {
-    // Return movies without video paths for security
-    return this.moviesRepository.find({ 
+    return this.moviesRepository.find({
       relations: ['uploadedBy'],
-      select: ['id', 'title', 'description', 'genre', 'releaseYear', 'duration', 'posterPath', 'createdAt'],
+      select: [
+        'id',
+        'title',
+        'description',
+        'genre',
+        'releaseYear',
+        'duration',
+        'posterPath',
+        'createdAt',
+      ],
     });
   }
 
-  async findByUser(userId: string): Promise<any> {
-    return this.moviesRepository.find({ 
+  async findByUser(userId: string): Promise<Movie[]> {
+    return this.moviesRepository.find({
       where: { uploadedById: userId },
       relations: ['uploadedBy'],
     });
@@ -48,7 +60,16 @@ export class MoviesService {
     const movie = await this.moviesRepository.findOne({
       where: { id },
       relations: ['uploadedBy'],
-      select: ['id', 'title', 'description', 'genre', 'releaseYear', 'duration', 'posterPath', 'createdAt'],
+      select: [
+        'id',
+        'title',
+        'description',
+        'genre',
+        'releaseYear',
+        'duration',
+        'posterPath',
+        'createdAt',
+      ],
     });
 
     if (!movie) {
@@ -58,7 +79,9 @@ export class MoviesService {
     return movie;
   }
 
-  async getFullMovie(id: string, userId: string): Promise<Movie & { message: string; streamUrl: string }> {
+  async getFullMovie(
+    id: string,
+  ): Promise<Movie & { message: string; streamUrl: string }> {
     const movie = await this.moviesRepository.findOne({
       where: { id },
       relations: ['uploadedBy'],
@@ -72,18 +95,27 @@ export class MoviesService {
       throw new NotFoundException('Full movie video not available');
     }
 
-    // Return movie with full video path
     return {
       ...movie,
       message: 'Access granted to full movie',
       streamUrl: `http://localhost:3000/${movie.videoPath}`,
-    } as Movie & { message: string; streamUrl: string };
+    };
   }
 
-  async getTrailer(id: string): Promise<any> {
+  async getTrailer(
+    id: string,
+  ): Promise<Partial<Movie> & { message: string; streamUrl: string }> {
     const movie = await this.moviesRepository.findOne({
       where: { id },
-      select: ['id', 'title', 'description', 'genre', 'releaseYear', 'posterPath', 'trailerPath'],
+      select: [
+        'id',
+        'title',
+        'description',
+        'genre',
+        'releaseYear',
+        'posterPath',
+        'trailerPath',
+      ],
     });
 
     if (!movie) {
@@ -101,9 +133,13 @@ export class MoviesService {
     };
   }
 
-  async delete(id: string, userId: string): Promise<any> {
-    const movie = await this.findOne(id);
-    
+  async delete(id: string, userId: string): Promise<void> {
+    const movie = await this.moviesRepository.findOne({ where: { id } });
+
+    if (!movie) {
+      throw new NotFoundException('Movie not found');
+    }
+
     if (movie.uploadedById !== userId) {
       throw new ForbiddenException('You can only delete your own movies');
     }
