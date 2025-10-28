@@ -12,6 +12,7 @@ async function bootstrap() {
   app.enableCors({
     // origin: process.env.FRONTEND_URL || 'http://localhost:3001',
     origin: [
+      'https://cinema-myanmar.vercel.app',
       'http://47.128.81.163',
       'http://localhost',
       'http://localhost:80',
