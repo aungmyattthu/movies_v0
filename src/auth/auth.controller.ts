@@ -160,7 +160,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const user = request.user as any;
-    await this.authService.logout(user.userId);
+    await this.authService.logout(user.id);
 
     response.clearCookie('refreshToken');
     return { message: 'Successfully logged out' };
