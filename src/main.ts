@@ -12,7 +12,7 @@ async function bootstrap() {
   app.enableCors({
     // origin: process.env.FRONTEND_URL || 'http://localhost:3001',
     origin: [
-      'http://47.128.81.163/',
+      'http://47.128.81.163',
       'http://localhost',
       'http://localhost:80',
       'https://localhost:443',
