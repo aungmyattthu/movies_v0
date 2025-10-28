@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, OnModuleInit  } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../roles/entities/role.entity';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,35 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
+  async onModuleInit() {
+    await this.createDefaultAdmin();
+  }
 
+  async createDefaultAdmin() {
+    const adminEmail = this.configService.get<string>('DEFAULT_ADMIN_EMAIL');
+    const adminUsername = this.configService.get<string>('DEFAULT_ADMIN_USERNAME');
+    const adminPassword = this.configService.get<string>('DEFAULT_ADMIN_PASSWORD');
+
+    if (!adminEmail || !adminUsername || !adminPassword) {
+      console.log('⚠️  Default admin credentials not configured in .env');
+      return;
+    }
+
+    const existingAdmin = await this.usersService.findByEmail(adminEmail);
+    
+    if (!existingAdmin) {
+      await this.usersService.create(
+        adminEmail,
+        adminUsername,
+        adminPassword,
+        UserRole.ADMIN,
+      );
+      console.log(`✅ Default admin created: ${adminEmail}`);
+    } else {
+      console.log('ℹ️  Default admin already exists');
+    }
+  }
+  
   async register(
     email: string,
     username: string,

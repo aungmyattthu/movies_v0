@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { MoviesModule } from './movies/movies.module';
 import { RolesModule } from './roles/roles.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { StorageModule } from './storage/storage.module'; // Add this
 
 @Module({
   imports: [
@@ -22,7 +23,9 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // Set to false in production
+        synchronize: true,
+        charset: 'utf8mb4',
+        timezone: 'Z',
       }),
       inject: [ConfigService],
     }),
@@ -31,6 +34,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     UsersModule,
     MoviesModule,
     SubscriptionsModule,
+    StorageModule, // Add this
   ],
   controllers: [AppController],
   providers: [AppService],
