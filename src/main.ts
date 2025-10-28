@@ -10,7 +10,17 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    // origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: [
+      'http://localhost:80',
+      'https://localhost:443',
+      'http://localhost:3001',
+      'http://localhost:5173', // Vite default dev port
+      'http://localhost:5174', // optional, if Vite picks next port
+      'http://localhost:5175', // optional
+      'http://localhost:5176', // your current frontend
+    ],
+    // origin: '*',
     credentials: true,
   });
 
