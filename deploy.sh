@@ -6,11 +6,14 @@ echo "🚀 Starting deployment to AWS Lightsail..."
 
 APP_NAME="movie-api"
 
-echo "📦 Installing dependencies with pnpm..."
-pnpm install --prod --frozen-lockfile
+echo "📦 Installing all dependencies with pnpm..."
+pnpm install --frozen-lockfile
 
 echo "🔨 Building application..."
 pnpm run build
+
+echo "🧹 Removing dev dependencies..."
+pnpm prune --prod
 
 echo "📁 Creating logs and uploads directories..."
 mkdir -p logs uploads
