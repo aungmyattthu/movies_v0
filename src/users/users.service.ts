@@ -56,4 +56,8 @@ export class UsersService {
       relations: ['role', 'subscription'],
     });
   }
+
+  async update(id: string, updateData: Partial<User>): Promise<void> {
+    await this.usersRepository.update(id, updateData);
+  }
 }
