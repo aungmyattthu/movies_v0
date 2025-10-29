@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,25 +21,25 @@ export class StorageService {
   private publicUrl: string;
 
   constructor(private configService: ConfigService) {
-  const accessKeyId = process.env.R2_ACCESS_KEY ?? '';
-  const secretAccessKey = process.env.R2_SECRET_KEY ?? '';
-  const endpoint = process.env.CLOUDFLARE_ENDPOINT ?? '';
+    const accessKeyId = process.env.R2_ACCESS_KEY ?? '';
+    const secretAccessKey = process.env.R2_SECRET_KEY ?? '';
+    const endpoint = process.env.CLOUDFLARE_ENDPOINT ?? '';
 
-  if (!accessKeyId || !secretAccessKey || !endpoint) {
-    throw new Error('Missing required S3 credentials or endpoint');
-  }
+    if (!accessKeyId || !secretAccessKey || !endpoint) {
+      throw new Error('Missing required S3 credentials or endpoint');
+    }
 
-  this.s3Client = new S3Client({
-    endpoint,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    },
-    region: "auto"
-  });
+    this.s3Client = new S3Client({
+      endpoint,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+      region: 'auto',
+    });
 
-    this.bucketName =  process.env.R2_BUCKET_NAME || 'video-streaming';
-    this.publicUrl =  process.env.R2_PUBLIC_URL || '';
+    this.bucketName = process.env.R2_BUCKET_NAME || 'video-streaming';
+    this.publicUrl = process.env.R2_PUBLIC_URL || '';
   }
 
   /**
@@ -56,7 +60,7 @@ export class StorageService {
       ContentType: contentType,
     });
 
-    const uploadUrl = await getSignedUrl(this.s3Client, command, { 
+    const uploadUrl = await getSignedUrl(this.s3Client, command, {
       expiresIn: 3600, // 1 hour
     });
 

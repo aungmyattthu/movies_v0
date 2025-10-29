@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Query, UseGuards, Body, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  Body,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBearerAuth,
   ApiQuery,
   ApiBody,
@@ -23,33 +31,36 @@ export class StorageController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Generate presigned URL for file upload (Admin only)',
-    description: 'Generates a presigned URL for uploading files directly to Cloudflare R2',
+    description:
+      'Generates a presigned URL for uploading files directly to Cloudflare R2',
   })
-  @ApiQuery({ 
-    name: 'fileType', 
+  @ApiQuery({
+    name: 'fileType',
     enum: ['video', 'trailer', 'poster'],
     description: 'Type of file to upload',
   })
-  @ApiQuery({ 
-    name: 'contentType', 
+  @ApiQuery({
+    name: 'contentType',
     example: 'video/mp4',
     description: 'MIME type of the file',
   })
-  @ApiQuery({ 
-    name: 'fileName', 
+  @ApiQuery({
+    name: 'fileName',
     required: false,
     description: 'Optional custom file name',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Presigned URL generated successfully',
     schema: {
       example: {
-        uploadUrl: 'https://cc1f0883b28c2eba06bf5eaf5dafc273.r2.cloudflarestorage.com/video-streaming/videos/sample.mp4?X-Amz-Algorithm=...',
+        uploadUrl:
+          'https://cc1f0883b28c2eba06bf5eaf5dafc273.r2.cloudflarestorage.com/video-streaming/videos/sample.mp4?X-Amz-Algorithm=...',
         fileKey: 'videos/550e8400-e29b-41d4-a716-446655440000.mp4',
-        publicUrl: 'https://your-r2-public-domain.com/videos/550e8400-e29b-41d4-a716-446655440000.mp4',
+        publicUrl:
+          'https://your-r2-public-domain.com/videos/550e8400-e29b-41d4-a716-446655440000.mp4',
         expiresIn: 3600,
       },
     },
@@ -61,31 +72,36 @@ export class StorageController {
     @Query('contentType') contentType: string,
     @Query('fileName') fileName?: string,
   ) {
-    return this.storageService.generatePresignedUrl(fileType, contentType, fileName);
+    return this.storageService.generatePresignedUrl(
+      fileType,
+      contentType,
+      fileName,
+    );
   }
 
   @Post('movie-upload-urls')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Generate all presigned URLs for movie upload (Admin only)',
-    description: 'Generates presigned URLs for poster, video, and trailer in one request',
+    description:
+      'Generates presigned URLs for poster, video, and trailer in one request',
   })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        movieId: { 
-          type: 'string', 
+        movieId: {
+          type: 'string',
           description: 'Optional movie ID for consistent naming',
           example: '550e8400-e29b-41d4-a716-446655440000',
         },
       },
     },
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'All presigned URLs generated successfully',
     schema: {
       example: {
@@ -112,9 +128,7 @@ export class StorageController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  async generateMovieUploadUrls(
-    @Body() body: { movieId?: string },
-  ) {
+  async generateMovieUploadUrls(@Body() body: { movieId?: string }) {
     return this.storageService.generateMovieUploadUrls(body.movieId);
   }
 }

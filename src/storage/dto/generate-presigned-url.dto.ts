@@ -15,7 +15,15 @@ export class GeneratePresignedUrlDto {
     example: 'video/mp4',
   })
   @IsString()
-  @IsIn(['video/mp4', 'video/webm', 'video/quicktime', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+  @IsIn([
+    'video/mp4',
+    'video/webm',
+    'video/quicktime',
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+  ])
   contentType: string;
 
   @ApiPropertyOptional({

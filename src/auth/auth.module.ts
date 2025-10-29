@@ -9,13 +9,16 @@ import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
-    UsersModule, 
+    UsersModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRATION') },
+        secret: configService.get<string>('JWT_SECRET') || 'default-secret',
+        signOptions: {
+          expiresIn: (configService.get<string>('JWT_EXPIRATION') ||
+            '1h') as unknown as number,
+        },
       }),
       inject: [ConfigService],
     }),
